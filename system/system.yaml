@@ -1,0 +1,47 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: mig
+  namespace: kube-system
+spec:
+  serviceAccountName: my-scheduler
+  tolerations:
+    - key: "key1"
+      operator: "Equal"
+      value: ""
+      effect: "NoSchedule"
+  nodeName: node-0.wedgood.shield-pg0.utah.cloudlab.us
+  restartPolicy: Never
+  volumes:
+    - name: task-pv-storage
+      persistentVolumeClaim:
+        claimName: pvc1-nfs-system
+  containers:
+    - name: worker1
+      image: fuyuqi1995/mig-worker
+      command: ["python"]
+      args: ["worker.py","node-1.wedgood.shield-pg0.utah.cloudlab.us","0.1","10"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: task-pv-storage
+    - name: worker2
+      image: fuyuqi1995/mig-worker
+      command: ["python"]
+      args: ["worker.py","node-2.wedgood.shield-pg0.utah.cloudlab.us","0.1","10"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: task-pv-storage
+    - name: worker3
+      image: fuyuqi1995/mig-worker
+      command: ["python"]
+      args: ["worker.py","node-3.rouji.shield-pg0.utah.cloudlab.us","0.1","10"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: task-pv-storage
+    - name: master
+      image: fuyuqi1995/mig-master
+      command: ["python"]
+      args: ["master.py"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: task-pv-storage
