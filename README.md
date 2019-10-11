@@ -26,11 +26,16 @@ Modify config to that
 
 Second, add a folder `/mnt/linuxidc/templates`, and put all working yaml file inside.
 
-## Designed pod
+## System
 
 ### system.yaml
 This yaml file is to create a pod consists of a master container and serveal worker containers. You can change args in worker container to set different parameters: checking time interval and threhold.
 
+For example:
+
+
+### ser.yaml
+Configure my-scheduler roles
 
 ## Implement experiment
 
@@ -38,17 +43,45 @@ This yaml file is to create a pod consists of a master container and serveal wor
 I have maintained some easily used script to implement experiments
 
 ### job_node_info.py
-
-It will generate job:node pairs into a csv file(Since our migrated algorithm will change containers ditribution, we can do it after implement `default` experiment.
+Firstly
+```
+kubectl get pod -o=custom-columns=NODE:.spec.nodeName,NAME:.metadata.name > info.txt
+```
+Then raw job_node info will be saved to info.txt
+```
+NODE                                         NAME
+node-2.wedgood.shield-pg0.utah.cloudlab.us   job1-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job2
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job3-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job4-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job5
+node-2.wedgood.shield-pg0.utah.cloudlab.us   job6
+node-3.rouji.shield-pg0.utah.cloudlab.us     job7
+```
+It will generate job:node pairs into a `job_node_info.csv` file(Since our migrated algorithm will change containers ditribution, we can do it after implement `default` experiment.
 
 ### change_yaml.py
-
-It provides a easy way to modify yaml files in `/mnt/linuxidc/templates`. There are two ways to use it
+Firstly
+```
+kubectl get pod -o=custom-columns=NODE:.spec.nodeName,NAME:.metadata.name > info.txt
+```
+Then raw job_node info will be saved to info.txt
+```
+NODE                                         NAME
+node-2.wedgood.shield-pg0.utah.cloudlab.us   job1-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job2
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job3-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job4-migrated
+node-1.wedgood.shield-pg0.utah.cloudlab.us   job5
+node-2.wedgood.shield-pg0.utah.cloudlab.us   job6
+node-3.rouji.shield-pg0.utah.cloudlab.us     job7
+```
+change_yaml.py provides a easy way to modify yaml files in `/mnt/linuxidc/templates`. There are two ways to use it
 ```
 	yaml_dic["spec"]["nodeName"] = job_node[name]
 	#yaml_dic["spec"].pop("nodeName")
  ```
-Now I have just commented second one. The first line mean change yaml file nodeName config to some job_node pair from now. For example, we firstly run default one, then use `python change_yaml.py`. Then when we implement `migrated` algorithm later, orginal containers before migrated will be the same as default. So it makes these two experiments comparable.
+Now I have just commented second one. The first line mean change yaml file nodeName config to some job_node pair from now. For example, we firstly run default one, then use `python change_yaml.py`. Then when we implement `migrated` algorithm later, orginal containers before migrated will be the same as info.txt. So it makes these two experiments comparable.
  
 ### test.py
 
