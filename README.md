@@ -32,7 +32,16 @@ Second, add a folder `/mnt/linuxidc/templates`, and put all working yaml file in
 This yaml file is to create a pod consists of a master container and serveal worker containers. You can change args in worker container to set different parameters: checking time interval and threhold.
 
 For example:
-
+```
+name: worker3
+      image: fuyuqi1995/mig-worker
+      command: ["python"]
+      args: ["worker.py","node-3.rouji.shield-pg0.utah.cloudlab.us","0.1","10"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: task-pv-storage
+```
+You need to change each 
 
 ### ser.yaml
 Configure my-scheduler roles
